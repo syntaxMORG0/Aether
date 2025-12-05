@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include "calculate.h"
+//#include "io.h"
 #include "uart.h"
 #include "keyboardDriver.h"
 
@@ -10,7 +9,7 @@ void print(const char *s) {
     }
 }
 
-void printNum(long num) {
+void print_num(long num) {
     char buffer[20];
     int i = 0;
 
@@ -42,15 +41,14 @@ void sleep(int ms) {
 
 int main() {
     print("Hello from Aether!\n");
-    
+
     print("\nEnter your name: ");
     char buffer[100];
     readLine(buffer, sizeof(buffer));
-    
+
     print("You entered: ");
     print(buffer);
     print("\n");
-    
-    while(1) {}
-    return 0;
+
+    while(1) {} // kernel should NEVER exit, implement ACPI or use (Ctrl + A -> X) to exit qemu
 }
