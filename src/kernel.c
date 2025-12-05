@@ -1,38 +1,4 @@
-//#include "io.h"
-#include "uart.h"
-#include "keyboardDriver.h"
-
-void print(const char *s) {
-    while (*s) {
-        while (*UART0_FR & UART0_FR_TXFF);  // wait for space in FIFO
-        *UART0_DR = *s++;
-    }
-}
-
-void print_num(long num) {
-    char buffer[20];
-    int i = 0;
-
-    if (num == 0) {
-        return;
-    }
-
-    if (num < 0) {
-        num = -num;
-    }
-
-    // convert number to string in reverse
-    while (num > 0) {
-        buffer[i++] = (num % 10) + '0';
-        num /= 10;
-    }
-
-    // print digits in correct order
-    for (int j = i - 1; j >= 0; j--) {
-        char c[2] = {buffer[j], '\0'};
-        print(c);
-    }
-}
+#include "io.h"
 
 void sleep(int ms) {
     volatile long i;
@@ -44,11 +10,12 @@ int main() {
 
     print("\nEnter your name: ");
     char buffer[100];
-    readLine(buffer, sizeof(buffer));
+    readline(buffer, sizeof(buffer));
 
-    print("You entered: ");
+    print("You entered: '");
     print(buffer);
-    print("\n");
+    print("'\n");
 
+    print("\nKernel exited... (Ctrl + A -> X to exit qemu)\n");
     while(1) {} // kernel should NEVER exit, implement ACPI or use (Ctrl + A -> X) to exit qemu
 }

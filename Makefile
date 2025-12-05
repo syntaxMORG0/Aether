@@ -8,6 +8,8 @@ LDFLAGS = -T src/linker.ld
 ELF = build/kernel.elf
 IMG = build/kernel.img
 
+OBJ = build/boot.o build/kernel.o build/io.o
+
 all: build build/kernel.img
 
 build:
@@ -19,14 +21,14 @@ build/%.o: src/%.s
 build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(ELF): build/boot.o build/kernel.o
+$(ELF): $(OBJ)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 $(IMG): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
 run: $(IMG)
-	qemu-system-arm -M versatilepb -m 128M -nographic -kernel $(IMG)
+	@qemu-system-arm -M versatilepb -m 128M -nographic -kernel $<
 
 r: run
 

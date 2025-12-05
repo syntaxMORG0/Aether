@@ -1,13 +1,41 @@
-// keyboard/input driver
-#ifndef KEYBOARD_DRIVER_H
-#define KEYBOARD_DRIVER_H
-
-#include <stddef.h>
+#include "io.h"
 #include "uart.h"
 
-char *readLine(char *buf, size_t bufSize) {
+void print(const char *s) {
+    while (*s) {
+        while (*UART0_FR & UART0_FR_TXFF);  // wait for space in FIFO
+        *UART0_DR = *s++;
+    }
+}
+
+void print_num(long num) {
+    char buffer[20];
+    int i = 0;
+
+    if (num == 0) {
+        return;
+    }
+
+    if (num < 0) {
+        num = -num;
+    }
+
+    // convert number to string in reverse
+    while (num > 0) {
+        buffer[i++] = (num % 10) + '0';
+        num /= 10;
+    }
+
+    // print digits in correct order
+    for (int j = i - 1; j >= 0; j--) {
+        char c[2] = {buffer[j], '\0'};
+        print(c);
+    }
+}
+
+char *readline(char *buf, size_t bufSize) {
     size_t len = 0;
-    
+
     while (1) {
         char c = uart_getchar();  // blocking read from UART
 
@@ -17,7 +45,7 @@ char *readLine(char *buf, size_t bufSize) {
             buf[len] = '\0';   // null terminate
             return buf;
         }
-    
+
         // BACKSPACE
         if (c == '\b' || c == 127) {
             if (len > 0) {
@@ -28,7 +56,7 @@ char *readLine(char *buf, size_t bufSize) {
             }
             continue;
         }
-    
+
         // normal characters
         if (len < bufSize - 1) {
             buf[len++] = c;
@@ -36,5 +64,3 @@ char *readLine(char *buf, size_t bufSize) {
         }
     }
 }
-
-#endif
