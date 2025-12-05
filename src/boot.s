@@ -11,5 +11,7 @@ hang:
     b hang
 
 .section .bss
-    .space 1024
+.align 4
+stack_bottom:
+    .space 4096
 stack_top:

@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include "calculate.h"
 #include "uart.h"
-#include "openKeyboardPort.h"
 #include "keyboardDriver.h"
 
 void print(const char *s) {
@@ -43,10 +42,15 @@ void sleep(int ms) {
 
 int main() {
     print("Hello from Aether!\n");
-    sleep(1000);
-    printNum(67868);
+    
+    print("\nEnter your name: ");
     char buffer[100];
     readLine(buffer, sizeof(buffer));
+    
+    print("You entered: ");
+    print(buffer);
+    print("\n");
+    
     while(1) {}
     return 0;
 }
