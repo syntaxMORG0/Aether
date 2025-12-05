@@ -3,24 +3,27 @@ LD = arm-none-eabi-ld
 AS = arm-none-eabi-as
 OBJCOPY = arm-none-eabi-objcopy
 CFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles
-LDFLAGS = -T linker.ld
+LDFLAGS = -T src/linker.ld
 
-all: kernel.img
+all: build build/kernel.img
 
-boot.o: boot.S
-	$(AS) boot.S -o boot.o
+build:
+	mkdir -p build
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
+build/boot.o: src/boot.s
+	$(AS) $< -o $@
 
-kernel.elf: boot.o kernel.o linker.ld
-	$(LD) $(LDFLAGS) boot.o kernel.o -o kernel.elf
+build/kernel.o: src/kernel.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-kernel.img: kernel.elf
-	$(OBJCOPY) -O binary kernel.elf kernel.img
+build/kernel.elf: build/boot.o build/kernel.o
+	$(LD) $(LDFLAGS) build/boot.o build/kernel.o -o build/kernel.elf
 
-run: kernel.img
-	qemu-system-arm -M versatilepb -m 128M -nographic -kernel kernel.img
+build/kernel.img: build/kernel.elf
+	$(OBJCOPY) -O binary build/kernel.elf build/kernel.img
+
+run: build/kernel.img
+	qemu-system-arm -M versatilepb -m 128M -nographic -kernel build/kernel.img
 
 clean:
-	rm -f *.o *.elf *.img
+	rm -rf ./build/
