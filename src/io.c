@@ -1,10 +1,10 @@
 #include "io.h"
 #include "uart.h"
 
-void print(const char *s) {
-    while (*s) {
+void print(const char *str) {
+    while (*str) {
         while (*UART0_FR & UART0_FR_TXFF);  // wait for space in FIFO
-        *UART0_DR = *s++;
+        *UART0_DR = *str++;
     }
 }
 
